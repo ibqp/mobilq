@@ -4,6 +4,7 @@ services:
     runtime: docker
     plan: free
     branch: main
+    repo: https://github.com/ibqp/mobilq
     dockerfilePath: ./Dockerfile
     autoDeploy: true
     envVars:
