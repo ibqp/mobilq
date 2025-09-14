@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Mo6uJIbI</title>
+        <link rel="stylesheet" href="/static/css/styles.css">
+        <link rel="stylesheet" href="/static/css/output.css">
+    </head>
+
+    <body class="bg-gray-100 min-h-screen">
+        <div class="max-w-7xl mx-auto py-6 px-6">
+            <!-- Header -->
+            <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-center md:text-left">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900">
+                        Comparison Results
+                    </h1>
+                    <p class="text-gray-600 mt-1">
+                        {% if selected_brands %}
+                            Found {{ products|length }} unique models from brands: {{ selected_brands|join(", ") }}
+                        {% else %}
+                            Found {{ products|length }} unique models from all brands
+                        {% endif %}
+                    </p>
+                </div>
+                <a href="/" class="inline-block px-5 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                    ← New Search
+                </a>
+            </div>
+
+            {% if products %}
+                <!-- Desktop Table -->
+                <div class="table-container bg-white rounded-lg shadow overflow-hidden hidden md:block">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200" id="resultsTable">
+                            <thead class="bg-gray-50">
+                            <tr>
+                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(0,'text')">
+                                    Brand <span class="sort-indicator" id="sort-0">↕</span>
+                                </th>
+                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(1,'text')">
+                                    Model <span class="sort-indicator" id="sort-1">↕</span>
+                                </th>
+                                <th class="sortable px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(2,'price')">
+                                    <span class="text-blue-600 font-bold">Elisa</span> <span class="sort-indicator" id="sort-2">↕</span>
+                                </th>
+                                <th class="sortable px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(3,'price')">
+                                    <span class="text-purple-600 font-bold">Telia</span> <span class="sort-indicator" id="sort-3">↕</span>
+                                </th>
+                                <th class="sortable px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onclick="sortTable(4,'price')">
+                                    <span class="text-gray-800 font-bold">Tele2</span> <span class="sort-indicator" id="sort-4">↕</span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody id="tableBody" class="bg-white divide-y divide-gray-200">
+                            {% for product in products %}
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ product.brand }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ product.model }}</td>
+
+                                <td class="px-6 py-4 text-center" data-price="{{ product.elisa.price if product.elisa else 99999 }}">
+                                    {% if product.elisa %}
+                                    <a href="{{ product.elisa.url }}" target="_blank" class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+                                        {{ "%.0f"|format(product.elisa.price) }} €
+                                    </a>
+                                    {% else %}
+                                    <span class="text-gray-400 text-sm">—</span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="px-6 py-4 text-center" data-price="{{ product.telia.price if product.telia else 99999 }}">
+                                    {% if product.telia %}
+                                    <a href="{{ product.telia.url }}" target="_blank" class="inline-block px-3 py-1 bg-purple-100 text-purple-600 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors">
+                                        {{ "%.0f"|format(product.telia.price) }} €
+                                    </a>
+                                    {% else %}
+                                    <span class="text-gray-400 text-sm">—</span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="px-6 py-4 text-center" data-price="{{ product.tele2.price if product.tele2 else 99999 }}">
+                                    {% if product.tele2 %}
+                                    <a href="{{ product.tele2.url }}" target="_blank" class="inline-block px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm font-medium hover:bg-gray-200 transition-colors">
+                                        {{ "%.0f"|format(product.tele2.price) }} €
+                                    </a>
+                                    {% else %}
+                                    <span class="text-gray-400 text-sm">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="cards-container flex flex-col gap-4 mt-4 md:hidden">
+                    {% for product in products %}
+                    <div class="bg-white rounded-md p-4 shadow flex flex-col gap-4">
+
+                        <!-- Header -->
+                        <div>
+                            <p class="text-sm text-gray-500">{{ product.brand }}</p>
+                            <h2 class="text-lg font-bold text-gray-900">{{ product.model }}</h2>
+                        </div>
+
+                        <!-- Prices -->
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            {% if product.elisa %}
+                                <a
+                                    href="{{ product.elisa.url }}"
+                                    target="_blank"
+                                    class="block bg-[#0052FF]/10 text-[#0052FF] rounded-md p-2 text-center shadow-md active:scale-95 transition transform"
+                                >
+                                    <div class="text-xs">Elisa</div>
+                                    <div class="font-bold text-sm">{{ "%.0f"|format(product.elisa.price) }} €</div>
+                                </a>
+                            {% else %}
+                                <div class="bg-gray-50 text-gray-200 rounded-md p-2">
+                                    <div class="text-xs">Elisa</div>
+                                    <div class="font-bold text-sm">—</div>
+                                </div>
+                            {% endif %}
+
+                            {% if product.telia %}
+                                <a
+                                    href="{{ product.telia.url }}"
+                                    target="_blank"
+                                    class="block bg-[#990AE3]/10 text-[#990AE3] rounded-md p-2 text-center shadow-md active:scale-95 transition transform"
+                                >
+                                    <div class="text-xs">Telia</div>
+                                    <div class="font-bold text-sm">{{ "%.0f"|format(product.telia.price) }} €</div>
+                                </a>
+                            {% else %}
+                                <div class="bg-gray-50 text-gray-200 rounded-md p-2">
+                                    <div class="text-xs">Telia</div>
+                                    <div class="font-bold text-sm">—</div>
+                                </div>
+                            {% endif %}
+
+                            {% if product.tele2 %}
+                                <a
+                                    href="{{ product.tele2.url }}"
+                                    target="_blank"
+                                    class="block bg-black/10 text-black rounded-md p-2 text-center shadow-md active:scale-95 transition transform"
+                                >
+                                    <div class="text-xs">Tele2</div>
+                                    <div class="font-bold text-sm">{{ "%.0f"|format(product.tele2.price) }} €</div>
+                                </a>
+                            {% else %}
+                                <div class="bg-gray-50 text-gray-200 rounded-md p-2">
+                                    <div class="text-xs">Tele2</div>
+                                    <div class="font-bold text-sm">—</div>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-12">
+                    <div class="text-6xl mb-4">🔍</div>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">No products found</h2>
+                    <p class="text-gray-600 mb-6">Try different brands or check back later</p>
+                    <a href="/" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        Try Another Search
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        <script src="/static/js/script.js"></script>
+    </body>
+</html>

@@ -1,0 +1,17 @@
+.vscode/
+.idea/
+.ropeproject/
+node_modules/
+__pycache__/
+*.pyc
+static/css/output.css
+venv/
+.venv/
+*.dockerignore
+.ipynb_checkpoints
+logs/
+*.log
+.DS_Store
+.env
+tests/
+drafts.txt
