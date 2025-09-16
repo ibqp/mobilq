@@ -3,14 +3,13 @@ FROM python:3.13-slim AS builder
 
 WORKDIR /app
 
-RUN apt-get update
-RUN apt-get install -y curl build-essential
-RUN rm -rf /var/lib/apt/lists/*
-
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-RUN apt-get install -y nodejs
-RUN npm install -g npm
-RUN rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y curl build-essential \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --prefix=/install --no-cache-dir -r requirements.txt
